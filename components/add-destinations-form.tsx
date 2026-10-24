@@ -36,60 +36,186 @@ const emptyForm = {
 }
 
 type FormKey = keyof typeof emptyForm
+type FormState = Record<FormKey, string>
+type FieldErrors = Partial<Record<FormKey, string>>
 
-// Filled fields rather than the kit's default transparent inputs.
-// One shared class keeps every control on the same height, radius and focus ring.
+export type TravelPackageInput = Omit<FormState, "category" | "price"> & {
+  category: string
+  price: number
+}
+
+// ---------------------------------------------------------------------------
+// TODO: wire this to your backend.
+// Replace the body with your fetch / server action / DB call, e.g.
+//   const res = await fetch("/api/destinations", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(payload),
+//   })
+//   return res.ok
+// ---------------------------------------------------------------------------
+async function submitPackage(payload: TravelPackageInput): Promise<boolean> {
+  console.log("Submitting package:", payload)
+
+  // Simulated latency so the pending state is visible; delete when real.
+  await new Promise((resolve) => setTimeout(resolve, 500))
+
+  return true
+}
+
+function validate(form: FormState): FieldErrors {
+  const errors: FieldErrors = {}
+
+  if (!form.name.trim()) errors.name = "Destination name is required."
+  if (!form.country.trim()) errors.country = "Country is required."
+  if (!form.duration.trim()) errors.duration = "Duration is required."
+  if (!form.departureDate) errors.departureDate = "Departure date is required."
+  if (!form.description.trim()) errors.description = "Description is required."
+
+  const price = Number(form.price)
+  if (!form.price.trim() || !Number.isFinite(price) || price < 0) {
+    errors.price = "Enter a valid price."
+  }
+
+  if (!form.imageUrl.trim()) {
+    errors.imageUrl = "Image URL is required."
+  } else {
+    try {
+      const url = new URL(form.imageUrl.trim())
+      if (!["http:", "https:"].includes(url.protocol)) {
+        errors.imageUrl = "Use an http(s) URL."
+      }
+    } catch {
+      errors.imageUrl = "Enter a valid URL."
+    }
+  }
+
+  return errors
+}
+
 const fieldClass =
-  "h-11 w-full rounded-lg border border-input bg-muted px-3.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+  "h-11 w-full rounded-lg border border-input bg-muted px-3.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30"
 
 const textareaClass =
-  "min-h-32 w-full rounded-lg border border-input bg-muted px-3.5 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+  "min-h-32 w-full rounded-lg border border-input bg-muted px-3.5 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30"
 
-// Drives both axes: Card applies it to `py`, CardContent to `px`, so the
-// card's padding stays square from one token instead of two hand-tuned values.
+// Card applies this to `py`, CardContent to `px` — one token keeps both axes square.
 const cardPadding = { "--card-spacing": "1.75rem" } as React.CSSProperties
 
 function Field({
   id,
   label,
+  error,
   children,
 }: {
   id: string
   label: string
+  error?: string
   children: React.ReactNode
 }) {
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   )
 }
 
 export function AddDestinationsForm({ className }: { className?: string }) {
-  const [form, setForm] = React.useState(emptyForm)
-  const [saved, setSaved] = React.useState(false)
+  const [form, setForm] = React.useState<FormState>(emptyForm)
+  const [errors, setErrors] = React.useState<FieldErrors>({})
+  const [pending, setPending] = React.useState(false)
+  const [status, setStatus] = React.useState<{
+    kind: "success" | "error"
+    message: string
+  } | null>(null)
 
   const update = (key: FormKey, value: string) => {
+    console.log("[onChange]", key, "=", value)
     setForm((previous) => ({ ...previous, [key]: value }))
-    setSaved(false)
+    setErrors((previous) => ({ ...previous, [key]: undefined }))
+  }
+
+  const reset = () => {
+    console.log("[onClick] Cancel clicked — form cleared")
+    setForm(emptyForm)
+    setErrors({})
+    setStatus(null)
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const res = await fetch('http://localhost:5000/add', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(form)
+    })
+
+    const data = await res.json()
+
+
+
+    
+
+    const nextErrors = validate(form)
+    setErrors(nextErrors)
+
+    if (Object.keys(nextErrors).length > 0) {
+      console.log("[onSubmit] validation failed:", nextErrors)
+      setStatus({ kind: "error", message: "Please fix the highlighted fields." })
+      return
+    }
+
+    console.log("[onSubmit] validation passed — sending payload")
+    setPending(true)
+    setStatus(null)
+
+    const payload: TravelPackageInput = {
+      name: form.name.trim(),
+      country: form.country.trim(),
+      category: form.category,
+      price: Number(form.price),
+      duration: form.duration.trim(),
+      departureDate: form.departureDate,
+      imageUrl: form.imageUrl.trim(),
+      description: form.description.trim(),
+    }
+
+    try {
+      const ok = await submitPackage(payload)
+
+      if (ok) {
+        setStatus({ kind: "success", message: `"${payload.name}" was added.` })
+        setForm(emptyForm)
+      } else {
+        setStatus({
+          kind: "error",
+          message: "Could not save the package. Please try again.",
+        })
+      }
+    } catch {
+      setStatus({
+        kind: "error",
+        message: "Something went wrong. Please try again.",
+      })
+    } finally {
+      setPending(false)
+    }
   }
 
   return (
     <Card style={cardPadding} className={className}>
       <CardContent>
-        <form
-          className="flex flex-col gap-6"
-          onSubmit={(event) => {
-            event.preventDefault()
-            setSaved(true)
-          }}
-        >
-          <Field id="name" label="Destination Name">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
+          <Field id="name" label="Destination Name" error={errors.name}>
             <Input
               id="name"
               name="name"
-              required
+              aria-invalid={Boolean(errors.name)}
               value={form.name}
               onChange={(event) => update("name", event.target.value)}
               placeholder="Bali Paradise"
@@ -98,11 +224,11 @@ export function AddDestinationsForm({ className }: { className?: string }) {
           </Field>
 
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field id="country" label="Country">
+            <Field id="country" label="Country" error={errors.country}>
               <Input
                 id="country"
                 name="country"
-                required
+                aria-invalid={Boolean(errors.country)}
                 value={form.country}
                 onChange={(event) => update("country", event.target.value)}
                 placeholder="Indonesia"
@@ -110,7 +236,7 @@ export function AddDestinationsForm({ className }: { className?: string }) {
               />
             </Field>
 
-            <Field id="category" label="Category">
+            <Field id="category" label="Category" error={errors.category}>
               <NativeSelect
                 id="category"
                 name="category"
@@ -128,13 +254,14 @@ export function AddDestinationsForm({ className }: { className?: string }) {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field id="price" label="Price (USD)">
+            <Field id="price" label="Price (USD)" error={errors.price}>
               <Input
                 id="price"
                 name="price"
                 type="number"
                 min={0}
-                required
+                step="1"
+                aria-invalid={Boolean(errors.price)}
                 value={form.price}
                 onChange={(event) => update("price", event.target.value)}
                 placeholder="e.g., 1299"
@@ -142,11 +269,11 @@ export function AddDestinationsForm({ className }: { className?: string }) {
               />
             </Field>
 
-            <Field id="duration" label="Duration">
+            <Field id="duration" label="Duration" error={errors.duration}>
               <Input
                 id="duration"
                 name="duration"
-                required
+                aria-invalid={Boolean(errors.duration)}
                 value={form.duration}
                 onChange={(event) => update("duration", event.target.value)}
                 placeholder="e.g., 7 Days/6 Nights"
@@ -155,26 +282,28 @@ export function AddDestinationsForm({ className }: { className?: string }) {
             </Field>
           </div>
 
-          <Field id="departureDate" label="Departure Date">
+          <Field
+            id="departureDate"
+            label="Departure Date"
+            error={errors.departureDate}
+          >
             <Input
               id="departureDate"
               name="departureDate"
               type="date"
-              required
+              aria-invalid={Boolean(errors.departureDate)}
               value={form.departureDate}
-              onChange={(event) =>
-                update("departureDate", event.target.value)
-              }
+              onChange={(event) => update("departureDate", event.target.value)}
               className={fieldClass}
             />
           </Field>
 
-          <Field id="imageUrl" label="Image URL">
+          <Field id="imageUrl" label="Image URL" error={errors.imageUrl}>
             <Input
               id="imageUrl"
               name="imageUrl"
               type="url"
-              required
+              aria-invalid={Boolean(errors.imageUrl)}
               value={form.imageUrl}
               onChange={(event) => update("imageUrl", event.target.value)}
               placeholder="https://example.com/image.jpg"
@@ -182,12 +311,12 @@ export function AddDestinationsForm({ className }: { className?: string }) {
             />
           </Field>
 
-          <Field id="description" label="Description">
+          <Field id="description" label="Description" error={errors.description}>
             <Textarea
               id="description"
               name="description"
               rows={5}
-              required
+              aria-invalid={Boolean(errors.description)}
               value={form.description}
               onChange={(event) => update("description", event.target.value)}
               placeholder="Describe the travel experience..."
@@ -195,12 +324,15 @@ export function AddDestinationsForm({ className }: { className?: string }) {
             />
           </Field>
 
-          {saved && (
+          {status && (
             <p
-              role="status"
-              className="rounded-lg bg-primary/10 px-4 py-3 text-sm font-medium text-primary"
+              role={status.kind === "error" ? "alert" : "status"}
+              className={`rounded-lg px-4 py-3 text-sm font-medium ${status.kind === "error"
+                  ? "bg-destructive/10 text-destructive"
+                  : "bg-primary/10 text-primary"
+                }`}
             >
-              Travel package saved. Connect a backend to persist it.
+              {status.message}
             </p>
           )}
 
@@ -209,18 +341,19 @@ export function AddDestinationsForm({ className }: { className?: string }) {
               type="button"
               variant="destructive"
               className="h-11 px-5 sm:w-auto"
-              onClick={() => {
-                setForm(emptyForm)
-                setSaved(false)
-              }}
+              onClick={reset}
             >
               <TrashIcon aria-hidden="true" />
               Cancel
             </Button>
 
-            <Button type="submit" className="h-11 px-5 sm:w-auto">
+            <Button
+              type="submit"
+              className="h-11 px-5 sm:w-auto"
+              disabled={pending}
+            >
               <SaveIcon aria-hidden="true" />
-              Add Travel Package
+              {pending ? "Saving..." : "Add Travel Package"}
             </Button>
           </div>
         </form>
