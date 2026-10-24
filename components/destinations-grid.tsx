@@ -173,7 +173,7 @@ export function DestinationsGrid({
               </span>
 
               <Link
-                href="#"
+                href={`/destinations/${destination._id}`}
                 className="mt-2 flex w-fit items-center gap-1 text-xs font-bold tracking-wider text-primary uppercase hover:underline"
               >
                 Book Now
