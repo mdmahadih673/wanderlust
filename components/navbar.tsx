@@ -13,12 +13,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import Link from "next/link"
 
 const navLinks = [
   { title: "Home", href: "/" },
   { title: "Destinations", href: "/destinations" },
   { title: "My Bookings", href: "/bookings" },
-  { title: "Admin", href: "/admin" },
+  { title: "Add Destinations", href: "/add-Destinations" },
 ] as const
 
 const authLinks = [
@@ -111,12 +112,12 @@ export function Navbar() {
         </div>
 
         {/* Center — wordmark */}
-        <a
+        <Link
           href="/"
           className="justify-self-center font-heading text-2xl leading-none font-bold tracking-tight text-primary transition-opacity hover:opacity-80 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none sm:text-3xl"
         >
           Wanderlast
-        </a>
+        </Link>
 
         {/* Right — account */}
         <nav
