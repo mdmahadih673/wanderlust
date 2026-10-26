@@ -7,12 +7,13 @@ import {
     Check,
     ArrowLeft,
     ArrowRight,
-    Pencil,
     ShieldCheck,
     Headphones,
     Plane,
 } from "lucide-react";
 import Image from "next/image";
+import { DestinationEditButton } from "@/components/destination-edit-button"
+import { DestinationDeleteButton } from "@/components/destination-delete-button";
 
 // This route reads uncached data (fetch + await params) and the Navbar uses
 // usePathname(), so it must render per-request instead of being prerendered.
@@ -67,13 +68,10 @@ const DestinationDetailsPage = async ({params,}: {params: Promise<{ id: string }
                         Back to Destinations
                     </Link>
 
-                    <Link
-                        href={`/destinations/${id}/edit`}
-                        className="flex items-center gap-2 rounded-md border border-gray-200 px-4 py-2 text-sm text-gray-700 transition hover:border-cyan-500 hover:text-cyan-600"
-                    >
-                        <Pencil size={14} />
-                        Edit
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <DestinationEditButton destination={data} />
+                        <DestinationDeleteButton destination={data} />
+                    </div>
                 </div>
 
                 {/* Hero Image */}
