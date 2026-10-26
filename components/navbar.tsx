@@ -24,8 +24,8 @@ const navLinks = [
 
 const authLinks = [
   { title: "Profile", href: "/profile", icon: true },
-  { title: "Login", href: "/login", icon: false },
-  { title: "Sign Up", href: "/signup", icon: false },
+  { title: "Login", href: "/signIn", icon: false },
+  { title: "Sign Up", href: "/signUp", icon: false },
 ] as const
 
 export function Navbar() {
@@ -45,18 +45,17 @@ export function Navbar() {
           aria-label="Primary"
         >
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.title}
               href={link.href}
               aria-current={isActive(link.href) ? "page" : undefined}
-              className={`text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none ${
-                isActive(link.href)
+              className={`text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none ${isActive(link.href)
                   ? "text-primary underline decoration-primary decoration-2 underline-offset-8"
                   : "text-muted-foreground underline-offset-8 hover:text-primary hover:underline decoration-transparent hover:decoration-primary/40"
-              }`}
+                }`}
             >
               {link.title}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -85,11 +84,10 @@ export function Navbar() {
                   <SheetClose
                     key={link.title}
                     render={<a href={link.href} />}
-                    className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none ${
-                      isActive(link.href)
+                    className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none ${isActive(link.href)
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {link.title}
                   </SheetClose>
@@ -142,7 +140,7 @@ export function Navbar() {
             size="sm"
             className="h-8"
             nativeButton={false}
-            render={<a href="/signup" />}
+            render={<Link href="/signUp" />}
           >
             Sign Up
           </Button>
