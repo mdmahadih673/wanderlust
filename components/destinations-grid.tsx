@@ -80,13 +80,22 @@ export function DestinationsGrid({
   const [price, setPrice] = React.useState("Any")
   const [sort, setSort] = React.useState("Sort By")
 
+  // The API can return the same document twice; dedupe by _id so React keys stay unique.
+  const uniqueDestinations = React.useMemo(() => {
+    const seen = new Map<string, Destination>()
+    for (const destination of destinations) {
+      if (!seen.has(destination._id)) seen.set(destination._id, destination)
+    }
+    return Array.from(seen.values())
+  }, [destinations])
+
   // Category options come from the data, so new categories need no code change.
   const categories = [
     "All",
-    ...Array.from(new Set(destinations.map((destination) => destination.category))),
+    ...Array.from(new Set(uniqueDestinations.map((destination) => destination.category))),
   ]
 
-  let visible = destinations.filter(
+  let visible = uniqueDestinations.filter(
     (destination) => category === "All" || destination.category === category
   )
 
