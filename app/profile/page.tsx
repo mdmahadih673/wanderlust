@@ -139,41 +139,14 @@ export default function ProfilePage() {
                 {/* Left — profile card */}
                 <Card className="h-fit">
                     <CardContent className="flex flex-col items-center text-center">
-                        <div className="relative">
-                            <Avatar size="lg" className="size-28">
-                                {user.image && (
-                                    <AvatarImage src={user.image} alt={user.name} />
-                                )}
-                                <AvatarFallback className="text-xl">
-                                    {initials(user.name)}
-                                </AvatarFallback>
-                            </Avatar>
-                            <ProfileEditButton
-                                user={user}
-                                trigger={
-                                    <button
-                                        type="button"
-                                        aria-label="Change profile photo"
-                                        className="absolute right-0 bottom-0 flex size-9 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-cyan-600 text-white ring-4 ring-card transition hover:bg-cyan-700 focus-visible:ring-3 focus-visible:ring-cyan-600/40 focus-visible:outline-none"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            className="size-4"
-                                            aria-hidden="true"
-                                        >
-                                            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-                                            <circle cx="12" cy="13" r="3" />
-                                        </svg>
-                                    </button>
-                                }
-                            />
-                        </div>
+                        <Avatar size="lg" className="size-40">
+                            {user.image && (
+                                <AvatarImage src={user.image} alt={user.name} />
+                            )}
+                            <AvatarFallback className="text-3xl">
+                                {initials(user.name)}
+                            </AvatarFallback>
+                        </Avatar>
 
                         <h2 className="mt-5 font-heading text-xl font-semibold">
                             {user.name}
