@@ -1,14 +1,6 @@
 import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
-import {
-    DestinationsGrid,
-    type Destination,
-} from "@/components/destinations-grid"
-
-function date(value: string) {
-    const [year, month, day] = value.split('-');
-    return `${month}/${day}/${year}`
-}
+import { type Destination } from "@/components/destinations-grid"
 
 const BookingCard = async ({ data, params }: { data: Destination; params: Promise<{ id: string }> }) => {
     const { id } = await params;
