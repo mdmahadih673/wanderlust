@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { NewsletterForm } from "@/components/newsletter-form"
+import { NewsletterForm } from "@/components/global/newsletter-form"
 import Link from "next/link"
 
 const quickLinks = [

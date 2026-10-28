@@ -158,8 +158,9 @@ export function AddDestinationsForm({ className }: { className?: string }) {
     const data = await res.json()
 
 
+    console.log(data);
 
-    
+
 
     const nextErrors = validate(form)
     setErrors(nextErrors)
@@ -328,8 +329,8 @@ export function AddDestinationsForm({ className }: { className?: string }) {
             <p
               role={status.kind === "error" ? "alert" : "status"}
               className={`rounded-lg px-4 py-3 text-sm font-medium ${status.kind === "error"
-                  ? "bg-destructive/10 text-destructive"
-                  : "bg-primary/10 text-primary"
+                ? "bg-destructive/10 text-destructive"
+                : "bg-primary/10 text-primary"
                 }`}
             >
               {status.message}

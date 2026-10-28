@@ -12,9 +12,9 @@ import {
     Plane,
 } from "lucide-react";
 import Image from "next/image";
-import { DestinationEditButton } from "@/components/destination-edit-button"
-import { DestinationDeleteButton } from "@/components/destination-delete-button";
-import BookingCard from "@/components/BookingCard";
+import { DestinationEditButton } from "@/components/Destinations/destination-edit-button"
+import { DestinationDeleteButton } from "@/components/Destinations/destination-delete-button";
+import BookingCard from "@/components/Destinations/BookingCard";
 
 
 

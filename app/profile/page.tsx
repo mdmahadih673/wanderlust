@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
-import { ProfileEditButton } from "@/components/profile-edit-button"
+import { ProfileEditButton } from "@/components/profile/profile-edit-button"
 import {
     DollarSignIcon,
     Globe2Icon,

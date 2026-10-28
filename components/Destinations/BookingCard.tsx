@@ -1,11 +1,10 @@
 "use client"
 import type { FormEvent } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
-import Link from 'next/link';
 import {
 
     type Destination,
-} from "@/components/destinations-grid"
+} from "@/components/Destinations/destinations-grid"
 import { useSession } from '@/lib/auth-client';
 
 
@@ -22,11 +21,28 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
         const result = {
             username: user?.name,
             email: user?.email,
-            image: user?.email,
+            image: user?.image,
             ...data,
-            departureDate: departureDate
+            departureDate: departureDate,
+
         }
-        console.log(result);
+
+        const res = await fetch('http://localhost:5000/booking', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(result)
+        })
+
+        // res.json() would choke on Express's HTML error page — check first.
+        if (!res.ok) {
+            console.error("Booking failed:", res.status, await res.text())
+            return
+        }
+
+        const booking = await res.json()
+        console.log(booking);
 
     }
 

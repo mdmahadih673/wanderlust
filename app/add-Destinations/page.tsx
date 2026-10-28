@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeftIcon } from "lucide-react"
 
-import { AddDestinationsForm } from "@/components/add-destinations-form"
+import { AddDestinationsForm } from "@/components/Add-Destinations/add-destinations-form"
 
 export const metadata: Metadata = {
   title: "Add Travel Package",

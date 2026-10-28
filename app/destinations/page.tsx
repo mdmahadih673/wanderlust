@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import {
   DestinationsGrid,
   type Destination,
-} from "@/components/destinations-grid"
+} from "@/components/Destinations/destinations-grid"
 
 // Live data from the backend on every request, so Next must not prerender it.
 export const instant = false

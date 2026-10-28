@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { ArrowRightIcon } from "lucide-react"
+import Link from "next/link"
 
 export function Cta() {
   return (
@@ -38,13 +39,13 @@ export function Cta() {
           Join thousands of travelers who have discovered the world with us
         </p>
 
-        <a
+        <Link
           href="/destinations"
           className="mt-8 inline-flex h-12 items-center justify-center gap-3 rounded-lg bg-white px-8 text-sm font-semibold tracking-[0.06em] text-neutral-900 uppercase shadow-lg transition-colors hover:bg-white/90 focus-visible:ring-3 focus-visible:ring-white/70 focus-visible:outline-none"
         >
           Book Your Trip Today
           <ArrowRightIcon className="size-4" aria-hidden="true" />
-        </a>
+        </Link>
       </div>
     </section>
   )
