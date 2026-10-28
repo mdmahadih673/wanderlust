@@ -1,8 +1,16 @@
 import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
-import { type Destination } from "@/components/destinations-grid"
+import {
+    
+    type Destination,
+} from "@/components/destinations-grid"
 
-const BookingCard = async ({ data, params }: { data: Destination; params: Promise<{ id: string }> }) => {
+function date(value: string) {
+    const [year, month, day] = value.split('-');
+    return `${month}/${day}/${year}`
+}
+
+const BookingCard = async ({ data, params }: { data: Destination; params: Promise<{ id: string }>; },) => {
     const { id } = await params;
     return (
         <aside>
@@ -24,7 +32,7 @@ const BookingCard = async ({ data, params }: { data: Destination; params: Promis
                         </label>
 
                         <p className="text-sm font-medium text-gray-800">
-                            {data.departureDate}
+                            {date(data.departureDate)}
                         </p>
                     </div>
 
