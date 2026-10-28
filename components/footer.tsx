@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils"
 import { NewsletterForm } from "@/components/newsletter-form"
+import Link from "next/link"
 
 const quickLinks = [
   { title: "Home", href: "/" },
@@ -64,12 +65,12 @@ export async function Footer() {
     <footer className="bg-neutral-950 text-neutral-300">
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         {/* Brand */}
-        <a
+        <Link
           href="/"
           className="font-heading inline-block text-4xl leading-none font-bold tracking-tight text-white transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none sm:text-5xl lg:text-6xl"
         >
           Wanderlast
-        </a>
+        </Link>
         <p className="mt-4 max-w-md text-sm text-neutral-400 sm:text-base">
           Your gateway to extraordinary travel experiences around the world.
         </p>

@@ -13,7 +13,7 @@ import {
 
 // Shape of what http://localhost:5000/destinations returns.
 // `price` arrives as a string, so every comparison goes through priceOf().
-export type Destination = {
+export interface Destination{
   _id: string
   name: string
   country: string
