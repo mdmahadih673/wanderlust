@@ -139,11 +139,11 @@ export default function ProfilePage() {
                 {/* Left — profile card */}
                 <Card className="h-fit">
                     <CardContent className="flex flex-col items-center text-center">
-                        <Avatar size="lg" className="size-40">
+                        <Avatar size="lg" className="size-52">
                             {user.image && (
                                 <AvatarImage src={user.image} alt={user.name} />
                             )}
-                            <AvatarFallback className="text-3xl">
+                            <AvatarFallback className="text-4xl">
                                 {initials(user.name)}
                             </AvatarFallback>
                         </Avatar>
