@@ -1,17 +1,36 @@
+"use client"
+import type { FormEvent } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import Link from 'next/link';
 import {
-    
+
     type Destination,
 } from "@/components/destinations-grid"
+import { useSession } from '@/lib/auth-client';
 
-function date(value: string) {
-    const [year, month, day] = value.split('-');
-    return `${month}/${day}/${year}`
-}
 
-const BookingCard = async ({ data, params }: { data: Destination; params: Promise<{ id: string }>; },) => {
-    const { id } = await params;
+
+const BookingCard = ({ data, }: { data: Destination; }) => {
+    const { data: session, } = useSession()
+
+    const user = session?.user
+
+    const handleBooking = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        const departureDate = new FormData(e.currentTarget).get("departureDate")
+
+        const result = {
+            username: user?.name,
+            email: user?.email,
+            image: user?.email,
+            ...data,
+            departureDate: departureDate
+        }
+        console.log(result);
+
+    }
+
+
     return (
         <aside>
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm lg:sticky lg:top-6">
@@ -28,16 +47,6 @@ const BookingCard = async ({ data, params }: { data: Destination; params: Promis
                 <div className="mt-6 space-y-4">
                     <div className="rounded-lg border border-gray-200 p-3">
                         <label className="mb-1 block text-xs text-gray-500">
-                            Departure Date
-                        </label>
-
-                        <p className="text-sm font-medium text-gray-800">
-                            {date(data.departureDate)}
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg border border-gray-200 p-3">
-                        <label className="mb-1 block text-xs text-gray-500">
                             Trip Duration
                         </label>
 
@@ -46,13 +55,29 @@ const BookingCard = async ({ data, params }: { data: Destination; params: Promis
                         </p>
                     </div>
 
-                    <Link
-                        href={`/destinations/${id}/book`}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
-                    >
-                        Book Now
-                        <ArrowRight size={17} />
-                    </Link>
+                    <form onSubmit={handleBooking}>
+
+                        <div className="rounded-lg border border-gray-200 p-3">
+                            <label className="mb-1 block text-xs text-gray-500">
+                                Departure Date
+                            </label>
+                            <input
+                                name='departureDate'
+                                type="date"
+                                aria-label='Departure Date'
+                                defaultValue={data.departureDate} />
+
+                        </div>
+
+                        <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-cyan-700">
+                            Book Now
+                            <ArrowRight size={17} />
+                        </button>
+
+                    </form>
+
+
+
                 </div>
 
                 <div className="mt-5 space-y-3 border-t border-gray-100 pt-5">

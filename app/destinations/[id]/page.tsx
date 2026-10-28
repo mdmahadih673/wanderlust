@@ -232,7 +232,7 @@ const DestinationDetailsPage = async ({params,}: {params: Promise<{ id: string }
 
                     {/* Right Booking Card */}
 
-                    <BookingCard data={data} params={params} />
+                    <BookingCard data={data} />
 
                 </div>
             </div>
