@@ -195,13 +195,13 @@ export function Navbar() {
               <Link
                 href="/profile"
                 aria-current={isActive("/profile") ? "page" : undefined}
-                className="inline-flex items-center gap-2 text-sm font-medium text-foreground/80 transition-colors hover:text-primary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+                aria-label="Go to profile"
+                className="inline-flex items-center gap-2 text-sm font-medium text-foreground/80 transition-colors hover:opacity-80 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
               >
                 <Avatar size="sm">
                   {user.image && <AvatarImage src={user.image} alt={user.name} />}
                   <AvatarFallback>{initials(user.name)}</AvatarFallback>
                 </Avatar>
-                Profile
               </Link>
               <Button
                 variant="outline"
