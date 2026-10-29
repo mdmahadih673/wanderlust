@@ -1,21 +1,71 @@
 "use client"
-import type { FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import {
-
     type Destination,
 } from "@/components/Destinations/destinations-grid"
 import { useSession } from '@/lib/auth-client';
+import { toast } from "@/components/ui/toast";
 
-
+const API = "http://localhost:5000"
 
 const BookingCard = ({ data, }: { data: Destination; }) => {
     const { data: session, } = useSession()
 
     const user = session?.user
 
+    // One active booking per account per destination — if this user already
+    // booked this destination, the Book Now button is disabled.
+    const [alreadyBooked, setAlreadyBooked] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
+
+    useEffect(() => {
+        const email = user?.email
+        let active = true
+
+        if (!email) {
+            // Defer the reset so we don't set state synchronously in the effect body.
+            Promise.resolve().then(() => {
+                if (active) setAlreadyBooked(false)
+            })
+            return () => {
+                active = false
+            }
+        }
+
+        fetch(`${API}/my-booking/${encodeURIComponent(email)}`)
+            .then((res) => (res.ok ? res.json() : []))
+            .then((bookings) => {
+                if (active && Array.isArray(bookings)) {
+                    setAlreadyBooked(
+                        bookings.some(
+                            (b: { destinationId?: string; status?: string }) =>
+                                b.destinationId === data._id && b.status !== "Cancelled",
+                        ),
+                    )
+                }
+            })
+            .catch(() => {
+                /* leave the button enabled if the check fails */
+            })
+
+        return () => {
+            active = false
+        }
+    }, [user?.email, data._id])
+
     const handleBooking = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (alreadyBooked || submitting) {
+            toast.add({
+                type: "info",
+                title: "Already booked",
+                description: `You've already booked this destination. Cancel it from My Bookings to rebook.`,
+            })
+            return
+        }
+
         const departureDate = new FormData(e.currentTarget).get("departureDate")
 
         const result = {
@@ -27,23 +77,63 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
 
         }
 
-        const res = await fetch('http://localhost:5000/booking', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(result)
+        setSubmitting(true)
+        const toastId = toast.add({
+            type: "loading",
+            title: "Booking your trip…",
+            timeout: 0,
         })
 
-        // res.json() would choke on Express's HTML error page — check first.
-        if (!res.ok) {
-            console.error("Booking failed:", res.status, await res.text())
-            return
+        try {
+            const res = await fetch(`${API}/booking`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(result)
+            })
+
+            // res.json() would choke on Express's HTML error page — check first.
+            if (res.status === 409) {
+                setAlreadyBooked(true)
+                toast.add({
+                    type: "warning",
+                    title: "Already booked",
+                    description: "You've already booked this destination. Cancel it from My Bookings to rebook.",
+                })
+                return
+            }
+
+            if (!res.ok) {
+                console.error("Booking failed:", res.status, await res.text())
+                toast.add({
+                    type: "error",
+                    title: "Booking failed",
+                    description: "Something went wrong while booking. Please try again.",
+                })
+                return
+            }
+
+            const booking = await res.json()
+            console.log(booking);
+
+            setAlreadyBooked(true)
+            toast.add({
+                type: "success",
+                title: "Booking confirmed!",
+                description: `${data.name} has been added to My Bookings.`,
+            })
+        } catch (err) {
+            console.error("Booking failed:", err)
+            toast.add({
+                type: "error",
+                title: "Booking failed",
+                description: "Something went wrong while booking. Please try again.",
+            })
+        } finally {
+            setSubmitting(false)
+            toast.update(toastId, { timeout: 1 })
         }
-
-        const booking = await res.json()
-        console.log(booking);
-
     }
 
 
@@ -85,8 +175,12 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
 
                         </div>
 
-                        <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-cyan-700">
-                            Book Now
+                        <button
+                            type="submit"
+                            disabled={alreadyBooked || submitting}
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                        >
+                            {alreadyBooked ? "Already Booked" : submitting ? "Booking…" : "Book Now"}
                             <ArrowRight size={17} />
                         </button>
 
@@ -95,6 +189,12 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
 
 
                 </div>
+
+                {alreadyBooked && (
+                    <p className="mt-3 text-center text-xs text-amber-600">
+                        You&apos;ve already booked this trip. Cancel it from My Bookings to rebook.
+                    </p>
+                )}
 
                 <div className="mt-5 space-y-3 border-t border-gray-100 pt-5">
                     {[

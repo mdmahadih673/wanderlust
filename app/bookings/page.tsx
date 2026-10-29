@@ -24,13 +24,11 @@ const BookingsPage = async () => {
     const data = await res.json()
     console.log(data);
 
-    // The API returns [] today, so the component's demo rows render instead.
-    // When it has bookings: pass them in and use BookingListItem for the list —
-    //   <MyBookings bookings={data} />
-    // BookingListItem lives on at components/bookings/booking-list-item.tsx.
+    // Live bookings from the API; MyBookings falls back to its demo rows
+    // while this list is empty. (Alternate card: components/bookings/booking-list-item.tsx)
     return (
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-            <MyBookings />
+            <MyBookings data={data} />
         </div>
     )
 }

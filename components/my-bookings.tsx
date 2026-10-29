@@ -5,59 +5,101 @@ import {
   ClockIcon,
   EyeIcon,
   HashIcon,
-  Trash2Icon,
 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "cn"
+import Link from "next/link"
+import { CancelBookingButton } from "@/components/bookings/cancel-booking-button"
 
-export type Booking = {
+// Shape of what http://localhost:5000/my-booking/:email returns — the
+// destination fields plus the user who booked it.
+export type ApiBooking = {
+  _id: string
+  name: string
+  imageUrl: string
+  price: string | number
+  departureDate?: string
+  status?: string
+}
+
+// Row shape this component renders.
+type Booking = {
   id: string
   title: string
   status: "Confirmed" | "Pending"
   departure: string
   bookingId: string
-  price: number
+  price: string | number
   image: string
 }
 
-// Placeholder rows matching the reference — swap for API data via the
-// `bookings` prop once there is something to show.
-const demoBookings: Booking[] = [
-  {
-    id: "1",
-    title: "Bali Paradise",
-    status: "Confirmed",
-    departure: "May 15, 2026",
-    bookingId: "b1",
-    price: 1299,
-    image: "/assets/destinations/image1.png",
-  },
-  {
-    id: "2",
-    title: "Bali Paradise",
-    status: "Confirmed",
-    departure: "May 15, 2026",
-    bookingId: "b1",
-    price: 1299,
-    image: "/assets/destinations/image2.png",
-  },
-  {
-    id: "3",
-    title: "Venice & Italian Riviera",
-    status: "Pending",
-    departure: "May 15, 2026",
-    bookingId: "b1",
-    price: 1299,
-    image: "/assets/destinations/image3.png",
-  },
-]
+// "2026-05-15" → "May 15, 2026" (parsed locally so the day never shifts).
+function formatDate(value?: string) {
+  if (!value) return "TBD"
+
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  const date = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(value)
+
+  if (Number.isNaN(date.getTime())) return value
+
+  return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+}
+
+// Mongo ids are long — shorten them for display.
+function shortenId(value: string) {
+  if (value.length <= 14) return value
+  return `${value.slice(0, 8)}…${value.slice(-4)}`
+}
+
+// API document → the row shape this component renders.
+function fromApi(booking: ApiBooking): Booking {
+  const rawStatus = booking.status?.toLowerCase()
+
+  let status: Booking["status"] = "Confirmed"
+  if (rawStatus === "pending") status = "Pending"
+
+  return {
+    id: booking._id,
+    title: booking.name,
+    // No status field yet — default to Confirmed, honour it if the API adds one.
+    status,
+    departure: formatDate(booking.departureDate),
+    bookingId: shortenId(booking._id),
+    price: booking.price,
+    image: booking.imageUrl,
+  }
+}
 
 const statusStyle = {
-  Confirmed: { className: "bg-green-50 text-green-600", Icon: CircleCheckIcon },
-  Pending: { className: "bg-amber-50 text-amber-600", Icon: ClockIcon },
+  confirmed: { className: "bg-green-50 text-green-600", Icon: CircleCheckIcon },
+  pending: { className: "bg-amber-50 text-amber-600", Icon: ClockIcon },
 } as const
 
-export function MyBookings({ bookings = demoBookings }: { bookings?: Booking[] }) {
+const defaultStatusStyle = {
+  className: "bg-gray-50 text-gray-600",
+  Icon: CircleCheckIcon,
+} as const
+
+// Tolerate any casing/label the API sends so a status we don't know
+// still renders instead of crashing on the lookup.
+function getStatusStyle(status: string) {
+  return statusStyle[status.toLowerCase() as keyof typeof statusStyle] ?? defaultStatusStyle
+}
+
+export function MyBookings({ data }: { data?: ApiBooking[] }) {
+  // Cancelled bookings are hidden here — cancelling removes the card from this
+  // list. The backend keeps the record (status "Cancelled") so the destination
+  // becomes bookable again.
+  const bookings = (data ?? [])
+    .filter((booking) => {
+      const status = booking.status?.toLowerCase()
+      return status !== "cancelled" && status !== "canceled"
+    })
+    .map(fromApi)
+
   return (
     <div>
       <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -68,12 +110,12 @@ export function MyBookings({ bookings = demoBookings }: { bookings?: Booking[] }
       </p>
 
       <div className="mt-8 flex flex-col gap-6">
-        {bookings.map((booking) => {
-          const { className, Icon } = statusStyle[booking.status]
+        {bookings.map((booking, index) => {
+          const { className, Icon } = getStatusStyle(booking.status)
 
           return (
             <article
-              key={booking.id}
+              key={`${booking.id}-${index}`}
               className="grid gap-5 rounded-2xl border border-border bg-card p-4 sm:grid-cols-[20rem_1fr] sm:p-5"
             >
               <Image
@@ -113,18 +155,18 @@ export function MyBookings({ bookings = demoBookings }: { bookings?: Booking[] }
                   </p>
 
                   <div className="flex flex-wrap gap-3">
-                    <Button
-                      variant="outline"
-                      className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2Icon aria-hidden="true" />
-                      Cancel
-                    </Button>
+                    <CancelBookingButton
+                      bookingId={booking.id}
+                      title={booking.title}
+                    />
 
-                    <Button>
+                    <Link
+                      href="/destinations"
+                      className={cn(buttonVariants())}
+                    >
                       <EyeIcon aria-hidden="true" />
                       View
-                    </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
