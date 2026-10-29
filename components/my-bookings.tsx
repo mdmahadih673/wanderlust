@@ -1,16 +1,21 @@
+"use client"
+
 import Image from "next/image"
 import {
   CalendarDaysIcon,
   CircleCheckIcon,
   ClockIcon,
+  CompassIcon,
   EyeIcon,
   HashIcon,
+  PlaneTakeoffIcon,
 } from "lucide-react"
 
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "cn"
 import Link from "next/link"
 import { CancelBookingButton } from "@/components/bookings/cancel-booking-button"
+import { useCancelledBookingIds } from "@/components/bookings/cancelled-bookings"
 
 // Shape of what http://localhost:5000/my-booking/:email returns — the
 // destination fields plus the user who booked it.
@@ -90,13 +95,19 @@ function getStatusStyle(status: string) {
 }
 
 export function MyBookings({ data }: { data?: ApiBooking[] }) {
-  // Cancelled bookings are hidden here — cancelling removes the card from this
-  // list. The backend keeps the record (status "Cancelled") so the destination
-  // becomes bookable again.
+  // Cancelled booking ids remembered in this browser (see cancelled-bookings.ts).
+  const cancelledIds = useCancelledBookingIds()
+
+  // Cards disappear from this list when the user cancels: the status filter
+  // covers records the backend marked "Cancelled", and the id filter covers
+  // records it reported deleting but kept — either way the card goes.
   const bookings = (data ?? [])
     .filter((booking) => {
       const status = booking.status?.toLowerCase()
-      return status !== "cancelled" && status !== "canceled"
+      if (status === "cancelled" || status === "canceled") return false
+
+      if (cancelledIds === null) return true
+      return !cancelledIds.includes(booking._id)
     })
     .map(fromApi)
 
@@ -175,9 +186,28 @@ export function MyBookings({ data }: { data?: ApiBooking[] }) {
         })}
 
         {bookings.length === 0 && (
-          <p className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-            You don&apos;t have any bookings yet.
-          </p>
+          <div className="flex flex-col items-center rounded-2xl border border-border bg-card px-6 py-14 text-center sm:py-20">
+            <div className="flex size-16 items-center justify-center rounded-full bg-cyan-50 text-cyan-600 ring-8 ring-cyan-50/50">
+              <PlaneTakeoffIcon className="size-8" aria-hidden="true" />
+            </div>
+
+            <h2 className="font-heading mt-6 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+              No bookings yet
+            </h2>
+
+            <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
+              Your upcoming trips will show up here once you book. Explore our
+              destinations and plan your next adventure.
+            </p>
+
+            <Link
+              href="/destinations"
+              className="mt-7 inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700"
+            >
+              <CompassIcon className="size-4" aria-hidden="true" />
+              Book now
+            </Link>
+          </div>
         )}
       </div>
     </div>

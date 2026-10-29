@@ -6,6 +6,7 @@ import { Trash2Icon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
+import { addCancelledBookingId } from "@/components/bookings/cancelled-bookings"
 
 const API = "http://localhost:5000"
 
@@ -27,8 +28,8 @@ export function CancelBookingButton({
 
     try {
       const res = await fetch(
-        `${API}/my-booking/${encodeURIComponent(bookingId)}/cancel`,
-        { method: "PATCH" },
+        `${API}/my-bookings/${encodeURIComponent(bookingId)}`,
+        { method: "DELETE" },
       )
 
       if (!res.ok) {
@@ -39,6 +40,12 @@ export function CancelBookingButton({
         })
         return
       }
+
+      // Remember the id in this browser so My Bookings hides the card even if
+      // the backend record survives its delete (string _id vs ObjectId — the
+      // route still answers 200). If the backend does delete it, this extra
+      // entry is harmless.
+      addCancelledBookingId(bookingId)
 
       toast.add({
         type: "success",
