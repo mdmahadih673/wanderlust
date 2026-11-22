@@ -12,7 +12,6 @@ import { ProfileEditButton } from "@/components/profile/profile-edit-button"
 import {
     DollarSignIcon,
     Globe2Icon,
-    MapPinIcon,
     PlaneIcon,
     TrendingUpIcon,
     UserIcon,

@@ -109,8 +109,6 @@ export function DestinationsGrid({
   if (sort === "Price: High to Low")
     visible = [...visible].sort((a, b) => priceOf(b) - priceOf(a))
 
-  console.log("[filters]", { category, price, sort }, "->", visible.length, "results")
-
   return (
     <div className={className}>
       {/* Filter bar */}

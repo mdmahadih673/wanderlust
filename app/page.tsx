@@ -4,13 +4,14 @@ import { WhyChooseUs } from "@/components/home/why-choose-us";
 import { Testimonials } from "@/components/home/testimonials";
 import { Cta } from "@/components/home/cta";
 import type { Destination } from "@/components/Destinations/destinations-grid";
+import { apiFetch } from "@/lib/api";
 
 // Live data from the backend on every request, so Next must not prerender it.
 export const instant = false;
 
 async function getDestinations(): Promise<Destination[]> {
   try {
-    const res = await fetch("http://localhost:5000/destinations");
+    const res = await apiFetch("/destinations");
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];

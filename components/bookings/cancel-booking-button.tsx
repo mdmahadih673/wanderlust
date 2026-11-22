@@ -7,8 +7,8 @@ import { Trash2Icon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { addCancelledBookingId } from "@/components/bookings/cancelled-bookings"
+import { API_BASE_URL } from "@/lib/api"
 
-const API = "http://localhost:5000"
 
 // Cancels a booking server-side, then refreshes the server-rendered list so
 // the destination becomes bookable again on its detail page.
@@ -28,7 +28,7 @@ export function CancelBookingButton({
 
     try {
       const res = await fetch(
-        `${API}/my-bookings/${encodeURIComponent(bookingId)}`,
+        `${API_BASE_URL}/my-bookings/${encodeURIComponent(bookingId)}`,
         { method: "DELETE" },
       )
 

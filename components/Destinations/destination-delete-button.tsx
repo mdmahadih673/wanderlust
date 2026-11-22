@@ -18,13 +18,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { API_BASE_URL } from "@/lib/api"
 
 type Destination = {
   _id: string
   name: string
 }
 
-const API = "http://localhost:5000"
 
 export function DestinationDeleteButton({
   destination,
@@ -44,7 +44,7 @@ export function DestinationDeleteButton({
     setError(null)
 
     try {
-      const res = await fetch(`${API}/destinations/${destination._id}`, {
+      const res = await fetch(`${API_BASE_URL}/destinations/${destination._id}`, {
         method: "DELETE",
       })
 

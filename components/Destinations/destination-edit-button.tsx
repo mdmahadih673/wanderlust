@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/native-select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
+import { API_BASE_URL } from "@/lib/api"
 
 // Shape of what http://localhost:5000/destinations/:id returns.
 export type Destination = {
@@ -43,7 +44,6 @@ export type Destination = {
   description?: string
 }
 
-const API = "http://localhost:5000"
 
 const categories = [
   "Beach",
@@ -150,7 +150,7 @@ export function DestinationEditButton({
     setSaveError(null)
 
     try {
-      const res = await fetch(`${API}/destinations/${destination._id}`, {
+      const res = await fetch(`${API_BASE_URL}/destinations/${destination._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

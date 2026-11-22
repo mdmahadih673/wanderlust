@@ -12,6 +12,7 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
+import { API_BASE_URL } from "@/lib/api"
 
 const categories = [
   "Beach",
@@ -44,23 +45,13 @@ export type TravelPackageInput = Omit<FormState, "category" | "price"> & {
   price: number
 }
 
-// ---------------------------------------------------------------------------
-// TODO: wire this to your backend.
-// Replace the body with your fetch / server action / DB call, e.g.
-//   const res = await fetch("/api/destinations", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(payload),
-//   })
-//   return res.ok
-// ---------------------------------------------------------------------------
 async function submitPackage(payload: TravelPackageInput): Promise<boolean> {
-  console.log("Submitting package:", payload)
-
-  // Simulated latency so the pending state is visible; delete when real.
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  return true
+  const response = await fetch(`${API_BASE_URL}/add`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+  return response.ok
 }
 
 function validate(form: FormState): FieldErrors {
@@ -132,13 +123,11 @@ export function AddDestinationsForm({ className }: { className?: string }) {
   } | null>(null)
 
   const update = (key: FormKey, value: string) => {
-    console.log("[onChange]", key, "=", value)
     setForm((previous) => ({ ...previous, [key]: value }))
     setErrors((previous) => ({ ...previous, [key]: undefined }))
   }
 
   const reset = () => {
-    console.log("[onClick] Cancel clicked — form cleared")
     setForm(emptyForm)
     setErrors({})
     setStatus(null)
@@ -147,31 +136,14 @@ export function AddDestinationsForm({ className }: { className?: string }) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const res = await fetch('http://localhost:5000/add', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(form)
-    })
-
-    const data = await res.json()
-
-
-    console.log(data);
-
-
-
     const nextErrors = validate(form)
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length > 0) {
-      console.log("[onSubmit] validation failed:", nextErrors)
       setStatus({ kind: "error", message: "Please fix the highlighted fields." })
       return
     }
 
-    console.log("[onSubmit] validation passed — sending payload")
     setPending(true)
     setStatus(null)
 

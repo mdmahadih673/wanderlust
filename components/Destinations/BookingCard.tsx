@@ -6,8 +6,8 @@ import {
 } from "@/components/Destinations/destinations-grid"
 import { useSession } from '@/lib/auth-client';
 import { toast } from "@/components/ui/toast";
+import { API_BASE_URL } from "@/lib/api";
 
-const API = "http://localhost:5000"
 
 const BookingCard = ({ data, }: { data: Destination; }) => {
     const { data: session, } = useSession()
@@ -33,7 +33,7 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
             }
         }
 
-        fetch(`${API}/my-booking/${encodeURIComponent(email)}`)
+        fetch(`${API_BASE_URL}/my-booking/${encodeURIComponent(email)}`)
             .then((res) => (res.ok ? res.json() : []))
             .then((bookings) => {
                 if (active && Array.isArray(bookings)) {
@@ -66,6 +66,11 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
             return
         }
 
+        if (!user?.email) {
+            toast.add({ type: "warning", title: "Sign in to book", description: "Please sign in before booking a trip." })
+            return
+        }
+
         const departureDate = new FormData(e.currentTarget).get("departureDate")
 
         const result = {
@@ -85,7 +90,7 @@ const BookingCard = ({ data, }: { data: Destination; }) => {
         })
 
         try {
-            const res = await fetch(`${API}/booking`, {
+            const res = await fetch(`${API_BASE_URL}/booking`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

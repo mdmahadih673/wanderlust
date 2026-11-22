@@ -15,6 +15,7 @@ import Image from "next/image";
 import { DestinationEditButton } from "@/components/Destinations/destination-edit-button"
 import { DestinationDeleteButton } from "@/components/Destinations/destination-delete-button";
 import BookingCard from "@/components/Destinations/BookingCard";
+import { apiFetch } from "@/lib/api";
 
 
 
@@ -23,7 +24,12 @@ export const instant = false;
 const DestinationDetailsPage = async ({params,}: {params: Promise<{ id: string }>;}) => {
     const { id } = await params;
 
-    const res = await fetch(`http://localhost:5000/destinations/${id}`);
+    let res: Response;
+    try {
+        res = await apiFetch(`/destinations/${encodeURIComponent(id)}`);
+    } catch {
+        res = new Response(null, { status: 503 });
+    }
 
     if (!res.ok) {
         return (

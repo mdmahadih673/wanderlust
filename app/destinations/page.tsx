@@ -4,6 +4,7 @@ import {
   DestinationsGrid,
   type Destination,
 } from "@/components/Destinations/destinations-grid"
+import { apiFetch } from "@/lib/api"
 
 // Live data from the backend on every request, so Next must not prerender it.
 export const instant = false
@@ -15,8 +16,16 @@ export const metadata: Metadata = {
 }
 
 const DestinationsPage = async () => {
-  const res = await fetch("http://localhost:5000/destinations")
-  const data: Destination[] = await res.json()
+  let data: Destination[] = []
+  try {
+    const res = await apiFetch("/destinations")
+    if (res.ok) {
+      const result: unknown = await res.json()
+      if (Array.isArray(result)) data = result as Destination[]
+    }
+  } catch {
+    // Keep the catalog usable when the API is temporarily unavailable.
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">

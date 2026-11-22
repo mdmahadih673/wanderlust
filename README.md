@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wanderlast
 
-## Getting Started
+Wanderlast is a travel booking app with a Next.js frontend, an Express API, MongoDB storage, and Better Auth accounts.
 
-First, run the development server:
+## Requirements
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20 or newer
+- MongoDB connection string
+- Separate terminals for the frontend and API
+
+## Configure
+
+Create `wanderlust/.env.local` with:
+
+```env
+MONGODB_URL=mongodb://127.0.0.1:27017
+BETTER_AUTH_SECRET=replace-with-a-long-random-secret
+BETTER_AUTH_URL=http://localhost:3000
+API_BASE_URL=http://localhost:5000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Google and GitHub OAuth sign-in are optional. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET` when those providers are configured.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `wanderlust-sarver/.env` with the same `MONGODB_URL` value and optionally `PORT=5000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Run locally
 
-## Learn More
+Install dependencies in both folders, then start MongoDB. In one terminal:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd wanderlust-sarver
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+In another terminal:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+cd wanderlust
+npm run dev
+```
 
-## Deploy on Vercel
+Open `http://localhost:3000`. Register an account to book trips. Signed-in users can add, edit, and delete destinations; booking and cancellation require an account.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Verify
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```

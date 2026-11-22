@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "dynamic-media-cdn.tripadvisor.com",
       },
+      // Allow any https image host
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+      // Allow any http image host
+      {
+        protocol: "http",
+        hostname: "**",
+      },
     ],
   },
   turbopack: {

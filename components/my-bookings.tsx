@@ -11,7 +11,7 @@ import {
   PlaneTakeoffIcon,
 } from "lucide-react"
 
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { cn } from "cn"
 import Link from "next/link"
 import { CancelBookingButton } from "@/components/bookings/cancel-booking-button"
@@ -26,6 +26,7 @@ export type ApiBooking = {
   price: string | number
   departureDate?: string
   status?: string
+  destinationId?: string
 }
 
 // Row shape this component renders.
