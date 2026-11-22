@@ -17,7 +17,7 @@ import Link from "next/link"
 import { CancelBookingButton } from "@/components/bookings/cancel-booking-button"
 import { useCancelledBookingIds } from "@/components/bookings/cancelled-bookings"
 
-// Shape of what http://localhost:5000/my-booking/:email returns — the
+// Shape of what the user's bookings API returns — the
 // destination fields plus the user who booked it.
 export type ApiBooking = {
   _id: string

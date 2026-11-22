@@ -31,7 +31,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { API_BASE_URL } from "@/lib/api"
 
-// Shape of what http://localhost:5000/destinations/:id returns.
+// Shape of what the destination detail API returns.
 export type Destination = {
   _id: string
   name: string

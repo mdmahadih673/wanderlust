@@ -11,7 +11,7 @@ import {
   StarIcon,
 } from "lucide-react"
 
-// Shape of what http://localhost:5000/destinations returns.
+// Shape of what the destinations API returns.
 // `price` arrives as a string, so every comparison goes through priceOf().
 export interface Destination{
   _id: string

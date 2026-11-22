@@ -48,7 +48,7 @@ Environment variables required:
 
 ### Data Fetching
 
-The app fetches destination data from an external backend API at `http://localhost:5000`:
+The app fetches destination data from the backend API at `https://wanderlust-sarver.vercel.app` by default. Override it with `NEXT_PUBLIC_API_BASE_URL` or `API_BASE_URL` when needed:
 
 - Pages that fetch live data set `export const instant = false` to prevent Next.js from prerendering
 - Destination type is defined in `components/destinations-grid.tsx`
@@ -86,7 +86,7 @@ To add more domains, update `next.config.ts` under `images.remotePatterns`.
 
 - **Next.js 16**: This version has breaking changes from earlier versions. Check `node_modules/next/dist/docs/` for current APIs before writing code
 - **MongoDB connection**: Ensure the MongoDB URL in `.env` is valid; the app connects on startup
-- **Backend dependency**: The destinations pages expect `http://localhost:5000/destinations` to be running
+- **Backend dependency**: Destination and booking pages require the configured backend API to be reachable
 - **Session management**: Use `useSession()` hook from `lib/auth-client.ts` to access user session in client components
 - **TypeScript strict mode**: The project has strict TypeScript enabled
 
